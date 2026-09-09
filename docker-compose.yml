@@ -1,0 +1,16 @@
+services:
+  kinbubble:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      # Set a long random string in production, e.g. `openssl rand -hex 32`
+      - JWT_SECRET=${JWT_SECRET:-}
+      # Set INSECURE_COOKIE=1 only if you run production over plain http (no TLS)
+      - INSECURE_COOKIE=${INSECURE_COOKIE:-}
+    volumes:
+      - kinbubble-data:/data
+    restart: unless-stopped
+volumes:
+  kinbubble-data:

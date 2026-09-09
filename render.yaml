@@ -1,0 +1,15 @@
+# One-click deploy on Render (https://render.com) — Blueprint spec
+services:
+  - type: web
+    name: kinbubble
+    runtime: docker
+    plan: starter
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATA_DIR
+        value: /data
+    disk:
+      name: kinbubble-data
+      mountPath: /data
+      sizeGB: 1
