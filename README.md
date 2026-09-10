@@ -26,7 +26,7 @@ npm install
 npm start          # http://localhost:3000
 ```
 
-Data lives in `./data/kinbubble.db` (SQLite). A random `JWT_SECRET` is generated on first run and stored in `./data/.jwt_secret`.
+Data lives in `./data/kinbubble.db` (SQLite) unless `DATABASE_URL` points at a Postgres server, in which case Postgres is used instead. A random `JWT_SECRET` is generated on first run and stored in `./data/.jwt_secret`.
 
 ## Run with Docker
 
@@ -38,6 +38,7 @@ Data persists in the `kinbubble-data` volume. In production set `JWT_SECRET` (`o
 
 ## Deploy
 
+- **Vercel (serverless) + Postgres** — the repo ships `vercel.json` + `api/index.js`. Import the repo in Vercel, then in the project's *Storage* tab add a **Neon Postgres** database (free tier); it injects `DATABASE_URL` automatically. Redeploy and you're live. Set a `JWT_SECRET` env var too (otherwise one is derived from the database URL).
 - **Render** — this repo includes `render.yaml`; create a new Blueprint from the repo and it deploys with a persistent disk.
 - **Fly.io / Railway / a VPS** — it is a plain Docker image with a `/data` volume; any host that gives you a persistent disk works.
 - **Reverse proxy** — the app trusts one proxy hop (`trust proxy`), so `X-Forwarded-*` headers from Caddy/nginx are honoured.
@@ -47,7 +48,8 @@ Data persists in the `kinbubble-data` volume. In production set `JWT_SECRET` (`o
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `PORT` | `3000` | HTTP port |
-| `DATA_DIR` | `./data` | Where the SQLite DB and secret live |
+| `DATABASE_URL` | — | Postgres connection string; when set, Postgres replaces SQLite |
+| `DATA_DIR` | `./data` | Where the SQLite DB and secret live (SQLite mode) |
 | `JWT_SECRET` | auto-generated | Signs session cookies — set explicitly in production |
 | `NODE_ENV` | — | `production` enables secure cookies |
 | `INSECURE_COOKIE` | — | `1` disables the `Secure` cookie flag |
@@ -69,7 +71,7 @@ All endpoints are JSON under `/api`. Session is a httpOnly cookie; share links p
 
 ## Stack
 
-Node 18+, Express 5, better-sqlite3, bcryptjs, jsonwebtoken · vanilla JS + D3 v7 (vendored) on the front end. No build step.
+Node 18+, Express 5, SQLite (better-sqlite3) or Postgres (pg), bcryptjs, jsonwebtoken · vanilla JS + D3 v7 (vendored) on the front end. No build step.
 
 ## License
 
