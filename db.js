@@ -81,6 +81,10 @@ if (IS_PG) {
     async get(sql, params = []) { return (await pool.query(sql, params)).rows[0] || null; },
     async run(sql, params = []) { const r = await pool.query(sql, params); return { changes: r.rowCount, row: r.rows[0] || null }; },
   };
+} else if (process.env.VERCEL) {
+  // Serverless without a database: fail loudly with a helpful message instead of crashing on a read-only disk.
+  const err = () => { const e = new Error('Database not configured: add a Postgres database (Vercel → Storage → Neon) so DATABASE_URL is set, then redeploy.'); e.status = 503; throw e; };
+  impl = { dialect: 'none', async init() { err(); }, all: err, get: err, run: err };
 } else {
   const Database = require('better-sqlite3');
   const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');

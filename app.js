@@ -343,7 +343,7 @@ app.get(/^\/(t\/[^/]+)?$/, (_req, res) => res.sendFile(path.join(__dirname, 'pub
 app.use('/api', (_req, _res, next) => next(new HttpError(404, 'Not found')));
 
 app.use((err, _req, res, _next) => {
-  if (!(err instanceof HttpError)) console.error(err);
+  if (!(err instanceof HttpError) && err.status !== 503) console.error(err);
   res.status(err.status || 500).json({ error: err.status ? err.message : 'Something went wrong' });
 });
 
